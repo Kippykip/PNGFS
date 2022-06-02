@@ -1,0 +1,155 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxCodeGen\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-03-23 23:17+0200\n"
+"PO-Revision-Date: 2008-03-23 23:17+0200\n"
+"Last-Translator: Bruce A Henderson\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ../..\n"
+
+#: ../../cgmain.bmx:86
+msgid "New Project"
+msgstr ""
+
+#: ../../codegenbase.bmx:79
+msgid "Projects"
+msgstr ""
+
+#: ../../codegenbase.bmx:91
+msgid "Add"
+msgstr ""
+
+#: ../../codegenbase.bmx:94
+msgid "Delete"
+msgstr ""
+
+#: ../../codegenbase.bmx:117
+msgid "Project Name"
+msgstr ""
+
+#: ../../codegenbase.bmx:126
+msgid "Project File"
+msgstr ""
+
+#: ../../codegenbase.bmx:130
+msgid "Select a Project File"
+msgstr ""
+
+#: ../../codegenbase.bmx:130
+msgid "*.*"
+msgstr ""
+
+#: ../../codegenbase.bmx:135
+msgid "BMX Project Folder"
+msgstr ""
+
+#: ../../codegenbase.bmx:139
+msgid "Select the BlitzMax Project folder"
+msgstr ""
+
+#: ../../codegenbase.bmx:144
+msgid "Generated Filename"
+msgstr ""
+
+#: ../../codegenbase.bmx:156
+msgid ".bmx"
+msgstr ""
+
+#: ../../codegenbase.bmx:166
+msgid "App Structure"
+msgstr ""
+
+#: ../../codegenbase.bmx:167
+msgid "Create SuperStrict"
+msgstr ""
+
+#: ../../codegenbase.bmx:170
+msgid "Create Import statements"
+msgstr ""
+
+#: ../../codegenbase.bmx:175
+msgid "Auto-Generate Code on Update"
+msgstr ""
+
+#: ../../codegenbase.bmx:180
+msgid "Project Config"
+msgstr ""
+
+#: ../../codegenbase.bmx:192
+msgid "Refresh"
+msgstr ""
+
+#: ../../codegenbase.bmx:197
+msgid "Application Code"
+msgstr ""
+
+#: ../../codegenbase.bmx:203
+msgid "Check for Project File Updates"
+msgstr ""
+
+#: ../../codegenbase.bmx:204
+msgid "Monitors the project files for changes."
+msgstr ""
+
+#: ../../codegenbase.bmx:208
+msgid "String Localization"
+msgstr ""
+
+#: ../../codegenbase.bmx:211
+msgid "wxCodeGen Language"
+msgstr ""
+
+#: ../../codegenbase.bmx:216
+msgid "Global Preferences"
+msgstr ""
+
+#: ../../codegenbase.bmx:224
+msgid "Generate"
+msgstr ""
+
+#: ../../codegenbase.bmx:243
+msgid "&New Project"
+msgstr ""
+
+#: ../../codegenbase.bmx:249
+msgid "&Quit"
+msgstr ""
+
+#: ../../codegenbase.bmx:251
+msgid "File"
+msgstr ""
+
+#: ../../codegenbase.bmx:256
+msgid "&About"
+msgstr ""
+
+#: ../../codegenbase.bmx:258
+msgid "&Help"
+msgstr ""
+
+#: ../../wxCodeGen.bmx:305
+msgid "Are you sure you want to delete? : "
+msgstr ""
+
+#: ../../wxCodeGen.bmx:307
+msgid "Delete Project?"
+msgstr ""
+
+#: ../../wxCodeGen.bmx:345
+msgid "You will need to restart wxCodeGen to see the new language."
+msgstr ""
+
+#: ../../wxCodeGen.bmx:346
+msgid "Language Changed"
+msgstr ""
+
+#: ../../wxCodeGen.bmx:360
+msgid "Updated at "
+msgstr ""
+

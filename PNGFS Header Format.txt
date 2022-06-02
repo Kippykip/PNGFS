@@ -1,0 +1,20 @@
+**Kippykips Simple PNG File**
+KSPF - 4 byte header
+Total output size in bytes - 4 byte INT
+Page file size in bytes - 4 byte INT
+Number of pages - 2 byte SHORT
+Current page id - 2 byte SHORT
+CRC16 checksum complete file - 2 byte SHORT
+CRC16 checksum page - 2 byte SHORT
+Filename - 12 bytes
+
+**Kippykips Dithered PNG File (Literally same as above, but every 2nd pixel is skipped and first byte is different)**
+KDPF - 4 byte header
+Total output size in bytes - 4 byte INT
+Page file size in bytes - 4 byte INT
+Number of pages - 2 byte SHORT
+Current page id - 2 byte SHORT
+CRC16 checksum complete file - 2 byte SHORT
+CRC16 checksum page - 2 byte SHORT
+Filename - 12 bytes
+

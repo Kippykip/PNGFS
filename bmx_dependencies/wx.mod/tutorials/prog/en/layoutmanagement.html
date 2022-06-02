@@ -1,0 +1,845 @@
+<html><head><title>Layout management in wxWidgets</title>
+
+
+<link rel="stylesheet" href="../media/format.css" type="text/css">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="keywords" content="wxWidgets, tutorial, widgets, layout C++, programming, GUI, multiplatform">
+<meta nam="description" content="Layout management in wxWidgets">
+<meta name="language" content="en">
+<meta name="author" content="jan bodnar">
+<meta name="distribution" content="global"></head><body>
+
+
+<div class="center">
+
+<div>&nbsp;
+<a href="index.html">Contents</a></div>
+
+<h1>Layout management in wxWidgets</h1>
+
+<p>
+A typical application consists of various widgets. Those widgets are
+placed inside container widgets. A programmer must manage the layout of
+the application. This is not an easy task. In wxWidgets we have two
+options.
+</p>
+<ul>
+<li>absolute positioning</li>
+<li>sizers</li>
+</ul>
+
+
+<h3>Absolute Positioning</h3>
+
+<p>
+The programmer specifies the position and the size of each widget in pixels. 
+When you use absolute positioning, you have to understand several things. 
+</p>
+
+<ul>
+<li>the size and the position of a widget do not change, if you resize a window</li>
+<li>applications look different (crappy) on various platforms</li>
+<li>changing fonts in your application might spoil the layout</li>
+<li>if you decide to change your layout, you must completely redo your layout, which is tedious and time consuming</li>
+</ul>
+
+<p>
+There might be situations, where we can possibly use absolute positioning. For example, my tutorials. I do 
+not want to make the examples too difficult, so I often use absolute positioning to explain a topic. 
+But mostly, in real world programs, programmers use sizers.
+</p>
+
+<p>
+In our example we have a simple skeleton of a text editor. If we resize the window, the size of out wxTextCtrl
+does not change as we would expect.
+</p>
+
+<br>
+<img src="../media/absolute1.jpg" alt="Before resizement"> 
+<div class="figure">
+Figure: before resizement
+</div>
+
+<br>
+<img src="../media/absolute2.jpg" alt="After resizement">
+<div class="figure">
+Figure: after resizement
+</div>
+
+<br>
+
+<pre class="code"><div class="codehead"><a href="../examples/absolute.bmx">absolute.bmx</a> &lt;- Open source</div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxTextCtrl
+Import wx.wxPanel
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local ab:Absolute = Absolute(New Absolute.Create(Null, wxID_ANY, ..
+			"Absolute", -1, -1, 250, 180))
+		ab.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Absolute Extends wxFrame
+ 
+	Field menubar:wxMenuBar
+	Field file:wxMenu
+	Field edit:wxMenu
+	Field help:wxMenu
+	Field textctrl:wxTextCtrl
+	
+	Method OnInit()
+ 
+		Local panel:wxPanel = New wxPanel.Create(Self, wxID_ANY)
+ 
+		menubar = New wxMenuBar.Create()
+		file = New wxMenu.Create()
+		edit = New wxMenu.Create()
+		help = New wxMenu.Create()
+		
+		menubar.Append(file, "&amp;File")
+		menubar.Append(edit, "&amp;Edit")
+		menubar.Append(help, "&amp;Help")
+		SetMenuBar(menubar)
+		
+		textctrl = New wxTextCtrl.Create(panel, -1, "", -1, -1, 250, 150)
+		
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+
+<p>
+This is an example, where we use absolute positioning. We position a <i>wxTextCtrl</i> widget on a panel widget.
+</p>
+
+<pre class="explanation"> textctrl = New wxTextCtrl.Create(panel, -1, "", -1, -1, 250, 150)
+</pre>
+
+<p>
+We do the absolute positioning in the constructor of the <i>wxTextCtrl</i> widget. In our case, we provide the default position for the widget. The width is 250px and the height 150px.
+</p>
+
+
+<h3>Using sizers</h3>
+
+<p>
+Sizers in wxWidgets do address all those issues, we mentioned by absolute positioning. We can choose among these sizers.
+</p>
+
+<ul>
+<li>wxBoxSizer</li>
+<li>wxStaticBoxSizer</li>
+<li>wxGridSizer</li>
+<li>wxFlexGridSizer</li>
+<li>wxGridBagSizer</li>
+</ul>
+
+<br>
+<img src="../media/sizer1.jpg" alt="Before resizement"> 
+<div class="figure">
+Figure: before resizement
+</div>
+
+<br>
+<img src="../media/sizer2.jpg" alt="After resizement">
+<div class="figure">
+Figure: after resizement
+</div>
+
+<br>
+
+
+<pre class="code"><div class="codehead"><a href="../examples/sizer.bmx">sizer.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxTextCtrl
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local sz:Sizer = Sizer(New Sizer.Create(Null, wxID_ANY, ..
+			"Sizer", -1, -1, 250, 180))
+		sz.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Sizer Extends wxFrame
+ 
+	Field menubar:wxMenuBar
+	Field file:wxMenu
+	Field edit:wxMenu
+	Field help:wxMenu
+	Field textctrl:wxTextCtrl
+	
+	Method OnInit()
+ 
+		menubar = New wxMenuBar.Create()
+		file = New wxMenu.Create()
+		edit = New wxMenu.Create()
+		help = New wxMenu.Create()
+		
+		menubar.Append(file, "&amp;File")
+		menubar.Append(edit, "&amp;Edit")
+		menubar.Append(help, "&amp;Help")
+		SetMenuBar(menubar)
+		
+		textctrl = New wxTextCtrl.Create(Self, -1, "", -1, -1, 250, 150)
+		
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+
+
+<br>
+<p>Ok, so you are saying that you don't see any sizers in the example?
+Well, the code example was a bit tricky. Actually, we placed the
+wxTextCtrl inside the wxFrame widget. The wxFrame widget has a special
+built-in sizer. We can put only one widget inside the wxFrame
+container. The child widget occupies all the space, which is not given
+to the borders, menu, toolbar and the statusbar.
+</p>
+
+
+
+
+<h3>wxBoxSizer</h3>This sizer enables us to put several widgets into a
+row or a column. We can put another sizer into an existing sizer. This
+way we can create very complex layouts. <pre class="constructor"> wxBoxSizer.Create(orient:Int)
+ Add(window:wxWindow, proportion:Int = 0, flag:Int = 0, border = 0)
+</pre>
+
+<p>
+The orientation can be wxVERTICAL or wxHORIZONTAL. Adding widgets into
+the wxBoxSizer is done via the Add() method. In order to understand it,
+we need to look at its parameters.
+</p>
+<p>The proportion parameter defines the ratio of how will the widgets
+change in the defined orientation. Let's assume we have tree buttons
+with the proportions 0, 1, and 2. They are added into a horizontal
+wxBoxSizer. Button with proportion 0 will not change at all. Button
+with proportion 2 will change twice more than the one with proportion 1
+in the horizontal dimension.
+</p>
+<p>With the flag parameter you can further configure the behaviour of
+the widgets within a wxBoxSizer. We can control the border between the
+widgets. We add some space between widgets in pixels. In order to apply
+border we need to define sides, where the border will be used. We can
+combine them with the | operator. e.g wxLEFT | wxBOTTOM. We can choose
+between these flags:
+</p>
+
+<ul>
+<li>wxLEFT</li>
+<li>wxRIGHT</li>
+<li>wxBOTTOM</li>
+<li>wxTOP</li>
+<li>wxALL</li>
+</ul>
+
+<br>
+<img src="../media/border.jpg" alt="border around a panel">
+<div class="figure">
+Figure: border around a panel
+</div>
+
+<pre class="code"><div class="codehead"><a href="../examples/border.bmx">border.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxPanel
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local ab:Border = Border(New Border.Create(Null, wxID_ANY, ..
+			"Border", -1, -1, 300, 200))
+		ab.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Border Extends wxFrame
+ 
+	Method OnInit()
+	
+		Local col1:wxColour = New wxColour.CreateNamedColour("#4f5049")
+		Local col2:wxColour = New wxColour.CreateNamedColour("#ededed")
+ 
+		Local panel:wxPanel = New wxPanel.Create(Self, wxID_ANY)
+ 
+		panel.SetBackgroundColour(col1)
+		Local vbox:wxBoxSizer = New wxBoxSizer.Create(wxVERTICAL)
+		
+		Local midPan:wxPanel = New wxPanel.Create(panel, wxID_ANY)
+		midPan.SetBackgroundColour(col2)
+		
+		vbox.Add(midPan, 1, wxEXPAND | wxALL, 20)
+		panel.SetSizer(vbox)
+				
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+
+<p>
+In this example, we create two panels. The second panel has some space around itself. 
+</p>
+
+<pre class="explanation"> vbox.Add(midPan, 1, wxEXPAND | wxALL, 20)
+</pre>
+
+<p>
+We have placed a 20 px border around a midPan panel. wxALL applies the border size to all four sides.
+If we use wxEXPAND flag, the widget will use all the space that has been allotted to it.
+</p>
+
+
+<p>
+Lastly, we can also define the alignment of our widgets. We do it with the following flags :
+</p>
+
+<ul>
+<li>wxALIGN_LEFT</li>
+<li>wxALIGN_RIGHT</li>
+<li>wxALIGN_TOP</li>
+<li>wxALIGN_BOTTOM</li>
+<li>wxALIGN_CENTER_VERTICAL</li>
+<li>wxALIGN_CENTER_HORIZONTAL</li>
+<li>wxALIGN_CENTER</li> 
+</ul>
+
+
+<p>
+Say we wanted to place two buttons into the right bottom of the window. 
+</p>
+
+
+<pre class="code"><div class="codehead"><a href="../examples/align.bmx">align.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxButton
+Import wx.wxPanel
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local ab:Align = Align(New Align.Create(Null, wxID_ANY, ..
+			"Align", -1, -1, 300, 200))
+		ab.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Align Extends wxFrame
+ 
+	Method OnInit()
+ 
+		Local panel:wxPanel = New wxPanel.Create(Self, wxID_ANY)
+ 
+		Local vbox:wxBoxSizer = New wxBoxSizer.Create(wxVERTICAL)
+		Local hbox1:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		Local hbox2:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		
+		Local ok:wxButton = New wxButton.Create(panel, -1, "Ok")
+		Local cancel:wxButton = New wxButton.Create(panel, -1, "Cancel")
+		
+		hbox1.Add(New wxPanel.Create(panel, -1))
+		vbox.AddSizer(hbox1, 1, wxEXPAND)
+		
+		
+		hbox2.Add(ok)
+		hbox2.Add(cancel)
+		
+		vbox.AddSizer(hbox2, 0, wxALIGN_RIGHT | wxRIGHT | wxBOTTOM, 10)
+		panel.SetSizer(vbox)
+				
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+<br>
+
+<p>
+We create three sizers. One vertical sizer and two horizontal sizers. We put those two horizontal sizers into the 
+vertical one. 
+</p>
+
+
+<pre class="explanation"> hbox1.Add(New wxPanel.Create(panel, -1))
+ vbox.AddSizer(hbox1, 1, wxEXPAND)</pre>
+
+<p>
+We put a <i>wxPanel</i> into the first horizontal sizer. We set the proportion to <i>1</i> and set a <i>wxEXPAND</i> flag.
+This way the sizer will occupy all the space except the <i>hbox2</i>.
+</p>
+
+<pre class="explanation"> vbox.AddSizer(hbox2, 0, wxALIGN_RIGHT | wxRIGHT | wxBOTTOM, 10)</pre>
+
+<p>
+We have placed the buttons into the <i>hbox2</i> sizer. The hbox2 is right aligned and we also put some space to the
+bottom and to the right of the buttons.
+</p>
+
+<br>
+<img src="../media/align.jpg" alt="aligning buttons">
+<div class="figure">
+Figure: aligning buttons
+</div>
+
+
+<h4>Go To Class</h4>
+
+<p>
+In the following example we introduce several important ideas. 
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/gotoclass.bmx">gotoclass.cpp</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxButton
+Import wx.wxPanel
+Import wx.wxStaticText
+Import wx.wxTextCtrl
+Import wx.wxCheckBox
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local gc:GotoClass = GotoClass(New GotoClass.Create(Null, wxID_ANY, ..
+			"GotoClass", -1, -1, 450, 400))
+		gc.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type GotoClass Extends wxFrame
+ 
+	Method OnInit()
+ 
+		Local panel:wxPanel = New wxPanel.Create(Self, -1)
+		
+		Local vbox:wxBoxSizer = New wxBoxSizer.Create(wxVERTICAL)
+		
+		Local hbox1:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		Local st1:wxStaticText = New wxStaticText.Create(panel, wxID_ANY, ..
+			"Class Name")
+		
+		hbox1.Add(st1, 0, wxRIGHT, 8)
+		Local tc:wxTextCtrl = New wxTextCtrl.Create(panel, wxID_ANY)
+		hbox1.Add(tc, 1)
+		vbox.AddSizer(hbox1, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, 10)
+		
+		vbox.AddCustomSpacer(-1, 10)
+		
+		Local hbox2:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		Local st2:wxStaticText = New wxStaticText.Create(panel, wxID_ANY, ..
+			"Matching Classes")
+		
+		hbox2.Add(st2, 0)
+		vbox.AddSizer(hbox2, 0, wxLEFT | wxTOP, 10)
+		
+		vbox.AddCustomSpacer(-1, 10)
+		
+		Local hbox3:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		Local tc2:wxTextCtrl = New wxTextCtrl.Create(panel, wxID_ANY, "", ..
+			-1, -1, -1, -1, wxTE_MULTILINE)
+		
+		hbox3.Add(tc2, 1, wxEXPAND)
+		vbox.AddSizer(hbox3, 1, wxLEFT | wxRIGHT | wxEXPAND, 10)
+		
+		vbox.AddCustomSpacer(-1, 25)
+		
+		Local hbox4:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		Local cb1:wxCheckBox = New wxCheckBox.Create(panel, wxID_ANY, ..
+			"Case Sensitive")
+		
+		hbox4.Add(cb1)
+		Local cb2:wxCheckBox = New wxCheckBox.Create(panel, wxID_ANY, ..
+			"Nested Classes")
+		
+		hbox4.Add(cb2, 0, wxLEFT, 10)
+		Local cb3:wxCheckBox = New wxCheckBox.Create(panel, wxID_ANY, ..
+			"Non-Project Classes")
+		
+		hbox4.Add(cb3, 0, wxLEFT, 10)
+		vbox.AddSizer(hbox4, 0, wxLEFT, 10)
+		
+		vbox.AddCustomSpacer(-1, 25)
+		
+		Local hbox5:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		Local btn1:wxButton = New wxButton.Create(panel, wxID_ANY, "Ok")
+		hbox5.Add(btn1, 0)
+		Local btn2:wxButton = New wxButton.Create(panel, wxID_ANY, "Close")
+		hbox5.Add(btn2, 0, wxLEFT | wxBOTTOM , 5)
+		vbox.AddSizer(hbox5, 0, wxALIGN_RIGHT | wxRIGHT, 10)
+		
+		panel.SetSizer(vbox)
+						
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+<br>
+
+<p>
+This is a complex example using <i>wxBoxSizer</i>. The layout is straitforward. We create one vertical sizer. We put then five horizontal sizers into it.
+</p>
+
+<pre class="explanation"> vbox.AddSizer(hbox3, 1, wxLEFT | wxRIGHT | wxEXPAND, 10)
+
+ vbox.AddCustomSpacer(-1, 25)</pre>
+
+
+<p>We already know that we can control the distance among widgets by
+combining the flag parameter with the border parameter. But there is
+one real constraint. In the AddSizer() method we can specify only one border
+for all given sides. In our example, we give 10px to the right and to
+the left. But we cannot give 25 px to the bottom. What we can do is to
+give 10px to the bottom, or 0px. If we omit wxBOTTOM. So if we need
+different values, we can add some extra space. With the AddCustomSpacer() method,
+we can insert  space as well.</p>
+
+<pre class="explanation"> vbox.AddSizer(hbox5, 0, wxALIGN_RIGHT | wxRIGHT, 10)</pre>
+
+<p>We place the two buttons on the right side of the window. How do we
+do it? Three things are important to achieve this. The proportion, the
+align flag and the wxEXPAND flag. The proportion must be zero. The
+buttons should not change their size, when we resize our window. We
+must not specify wxEXPAND flag. The buttons occopy only the area that
+has been alotted to it. And finally, we must specify the wxALIGN_RIGHT
+flag. The horizontal sizer spreads from the left side of the window to
+the right side. So if we specify wxALIGN_RIGHT flag, the buttons are
+placed to the right side. Exactly, as we wanted.
+</p>
+
+
+<br>
+<img src="../media/goto.jpg" alt="GotoClass">
+<div class="figure">
+Figure: GotoClass
+</div>
+
+
+<h3>wxGridSizer</h3>
+
+<p>
+wxGridSizer lays out widgets in two dimensional table. Each cell within the table has the same size.
+</p>
+
+<pre class="definition"> wxGridSizer.CreateRC(rows:Int, cols:Int, vgap:Int, hgap:Int)
+</pre>
+
+<p>
+In the constructor we specify the number of rows and columns in the table. And the vertical and horizontal 
+space between our cells.
+</p>
+
+<p>
+In our example we create a skeleton of a calculator. It is a perfect example for a wxGridSizer. 
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/gridsizer.bmx">gridsizer.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxTextCtrl
+Import wx.wxButton
+Import wx.wxStaticText
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local gs:GridSizer = GridSizer(New GridSizer.Create(Null, wxID_ANY, ..
+			"GridSizer", -1, -1, 270, 220))
+		gs.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type GridSizer Extends wxFrame
+
+	Field menubar:wxMenuBar
+	Field file:wxMenu
+	
+	Field sizer:wxBoxSizer
+	Field gs:wxGridSizer
+	Field display:wxTextCtrl
+
+ 
+	Method OnInit()
+ 
+		menubar = New wxMenuBar.Create()
+		file = New wxMenu.Create()
+		
+		SetMenuBar(menubar)
+		
+		sizer = New wxBoxSizer.Create(wxVERTICAL)
+		
+		display = New wxTextCtrl.Create(Self, -1, "", -1, -1, -1, -1, wxTE_RIGHT)
+		
+		sizer.Add(display, 0, wxEXPAND | wxTOP | wxBOTTOM, 4)
+		gs = New wxGridSizer.CreateRC(4, 4, 3, 3)
+		
+		gs.Add(New wxButton.Create(Self, -1, "Cls"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "Bck"), 0, wxEXPAND)
+		gs.Add(New wxStaticText.Create(Self, -1, ""), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "Close"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "7"), 0, wxEXPAND) 
+		gs.Add(New wxButton.Create(Self, -1, "8"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "9"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "/"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "4"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "5"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "6"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "*"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "1"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "2"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "3"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "-"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "0"), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "."), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "="), 0, wxEXPAND)
+		gs.Add(New wxButton.Create(Self, -1, "+"), 0, wxEXPAND)
+		
+		sizer.AddSizer(gs, 1, wxEXPAND)
+		SetSizer(sizer)
+		SetMinSize(270, 220)
+			
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+
+
+
+<br>
+
+<p>
+In our example, we set a vertical sizer for a wxFrame. We put a static text and a grid sizer into the 
+vertical sizer. 
+</p>
+
+<p>
+Notice how we managed to put a space between the Bck and the Close buttons. We simply put an empty wxStaticText there. 
+Such tricks are quite common.
+</p> 
+
+<pre class="explanation"> gs.Add(New wxButton.Create(Self, -1, "Cls"), 0, wxEXPAND)</pre>
+
+<p>
+We call the <i>Add()</i> method multiple times. 
+Widgets are placed inside the table in the order, they are added. The first row is filled first, then the second row etc. 
+</p>
+
+<br>
+<img src="../media/gridsizer.jpg" alt="GridSizer">
+<div class="figure">
+Figure: GridSizer
+</div>
+
+
+
+<h3>wxFlexGridSizer</h3>
+
+<p>
+This sizer is similar to <i>wxGridSizer</i>. It does  also lay out it's widgets in a two dimensional table. It adds some flexibility to it. <i>wxGridSizer</i> cells are of the same size. All cells in <i>wxFlexGridSizer</i> have the same height in a row. All cells have the same width in a column. 
+But all rows and columns are not necessarily the same height or width. 
+
+</p>
+
+<pre class="definition"> wxFlexGridSizer.CreateRC(rows:Int, cols:Int, vgap:Int, hgap:Int)
+</pre>
+
+<p>
+<i>rows</i> and <i>cols</i> specify the number of rows and columns in a sizer. <i>vgap</i> and <i>hgap</i> add some space between widgets in both directions. 
+</p>
+
+<p>
+Many times developers have to develop dialogs for data input and modification. I find <i>wxFlexGridSizer</i>
+suitable for such a task. A developer can easily set up a dialog window
+with this sizer. It is also possible to accomplish this with <i>wxGridSizer</i>, but it would not look nice, because of the constraint that each cell has the same size. 
+</p>
+
+
+<pre class="code"><div class="codehead"><a href="../examples/flexgridsizer.bmx">flexgridsizer.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxTextCtrl
+Import wx.wxStaticText
+Import wx.wxPanel
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local gs:FlexGridSizer = FlexGridSizer(New FlexGridSizer.Create(Null, ..
+			wxID_ANY, "FlexGridSizer", -1, -1, 270, 220))
+		gs.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type FlexGridSizer Extends wxFrame
+
+
+	Method OnInit()
+ 
+		Local panel:wxPanel = New wxPanel.Create(Self, -1)
+		
+		Local hbox:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		
+		Local fgs:wxFlexGridSizer = New wxFlexGridSizer.CreateRC(3, 2, 9, 25)
+		
+		Local thetitle:wxStaticText = New wxStaticText.Create(panel, -1, "Title")
+		Local author:wxStaticText = New wxStaticText.Create(panel, -1, "Author")
+		Local review:wxStaticText = New wxStaticText.Create(panel, -1, "Review")
+		
+		Local tc1:wxTextCtrl = New wxTextCtrl.Create(panel, -1)
+		Local tc2:wxTextCtrl = New wxTextCtrl.Create(panel, -1)
+		Local tc3:wxTextCtrl = New wxTextCtrl.Create(panel, -1, "", ..
+			-1, -1, -1, -1, wxTE_MULTILINE)
+		
+		fgs.Add(thetitle)
+		fgs.Add(tc1, 1, wxEXPAND)
+		fgs.Add(author)
+		fgs.Add(tc2, 1, wxEXPAND)
+		fgs.Add(review, 1, wxEXPAND)
+		fgs.Add(tc3, 1, wxEXPAND)
+		
+		fgs.AddGrowableRow(2, 1)
+		fgs.AddGrowableCol(1, 1)
+		
+		hbox.AddSizer(fgs, 1, wxALL | wxEXPAND, 15)
+		panel.SetSizer(hbox)
+			
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+<br>
+
+<p>
+In our example we create a simple dialog. It could be used to insert data into the database.
+</p>
+
+<pre class="explanation"> Local hbox:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+ ...
+ hbox.AddSizer(fgs, 1, wxALL | wxEXPAND, 15)</pre>
+
+<p>
+We create a horizontal box sizer in order to put some space (15px) around the table of widgets.
+</p>
+
+<pre class="explanation"> fgs.Add(thetitle)</pre>
+
+<p>
+We add widgets to the sizer exactly as with the gridsizer.
+</p>
+
+<pre class="explanation">  fgs.AddGrowableRow(2, 1)
+  fgs.AddGrowableCol(1, 1)</pre>
+
+<p>
+We make the third row and the second column growable. This way we make
+the text controls grow, when the window is resized. The first two text
+controls will grow in horizontal direction, the third one will grow in
+both direction. We must not forget to make the widgets expandable
+(wxEXPAND) in order to make it really work.
+</p>
+
+
+<br>
+<img src="../media/flexgridsizer.jpg" alt="FlexGridSizer">
+<div class="figure">
+Figure: FlexGridSizer
+</div>
+<br>
+
+<br>
+
+
+<center>
+<div class="botNav"><span class="botNavItem"><a href="index.html">Contents</a></span> ‡ <span class="botNavItem"><a href="#">Top of Page</a></span></div>
+</center>
+
+<div class="footer">
+<div class="signature"><span class="copyright">© 2007 Jan Bodnar</span><br>
+<span class="copyright"> Adapted for BlitzMax by Bruce A Henderson</span></div>
+</div>
+
+</div>
+</body></html>

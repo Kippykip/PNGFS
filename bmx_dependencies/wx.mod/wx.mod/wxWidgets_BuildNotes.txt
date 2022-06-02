@@ -1,0 +1,218 @@
+Build Notes
+-----------
+
+Linux :
+
+    wxGTK 3.1.x
+
+	32-bit
+	./configure --with-gtk=3 --enable-unicode --with-opengl --enable-graphics_ctx --enable-mediactrl --disable-shared --with-zlib=builtin --with-expat=builtin --with-libjpeg=builtin --with-libpng=builtin --without-libtiff --disable-std_iostreams CFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES -m32" CPPFLAGS=-m32 LDFLAGS=-m32 CXXFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES -DWX_WEB_EXTENSIONS_DIRECTORY=\\\".\\\""
+
+	64-bit
+	./configure --with-gtk=3 --enable-unicode --with-opengl --enable-graphics_ctx --enable-mediactrl --disable-shared --with-zlib=builtin --with-expat=builtin --with-libjpeg=builtin --with-libpng=builtin --without-libtiff --disable-std_iostreams CFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES" CXXFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES -DWX_WEB_EXTENSIONS_DIRECTORY=\\\".\\\""
+
+
+Raspberry pi :
+	./configure --with-gtk=3 --enable-unicode --with-opengl --enable-graphics_ctx --disable-mediactrl --disable-shared --with-zlib=builtin --with-expat=builtin --with-libjpeg=builtin --with-libpng=builtin --without-libtiff --disable-std_iostreams CFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES -m32" CPPFLAGS=-m32 LDFLAGS=-m32 CXXFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES -DWX_WEB_EXTENSIONS_DIRECTORY=\\\".\\\""
+
+    add "--disable-shared" for static libraries
+    using "--enable-mediactrl" requires gstreamer installation
+    
+    make
+    make install (as root) (not required for static libraries)
+   
+    Static .a files are built to the "lib" folder.
+
+    The build-specific headers are located in "lib/wx"
+
+    After copying the libs, you need to change a folder name, as it contains a -2.x suffix which we don't need.
+    Go into wx.mod/lib/<build>/wx/include/
+    You'll see something like mac-unicode-release-static-2.8
+    Remove the -2.8, so that it becomes mac-unicode-release-static
+
+	Note : to build with wxMediaCtrl you will need the gstreamer dev packages. something like libgstreamermm-1.0-dev.
+
+MacOS :
+
+    wxMac 3.1.x
+
+	32-bit
+	../configure --with-osx_cocoa --enable-unicode --with-opengl --enable-mediactrl --enable-graphics_ctx --disable-shared --with-zlib=builtin --with-expat=builtin --with-libjpeg=builtin --with-libpng=builtin --without-libtiff --disable-std_iostreams CFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES" CPPFLAGS=-m32 LDFLAGS=-m32 CXXFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES" --with-macosx-version-min=10.9
+
+	64-bit
+	../configure --with-osx_cocoa --enable-unicode --with-opengl --enable-mediactrl --enable-graphics_ctx --disable-shared --with-zlib=builtin --with-expat=builtin --with-libjpeg=builtin --with-libpng=builtin --without-libtiff --disable-std_iostreams CFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES" CXXFLAGS="-DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES" --with-macosx-version-min=10.9
+	
+    use "--disable-shared" for static libraries, otherwise you get .dylibs
+
+
+    make
+    for a shared install use
+        sudo make install  (requires admin password)
+
+    Static .a files are built to the "lib" folder.
+    The build-specific headers are located in "lib/wx"
+
+    After copying the libs, you need to change a folder name, as it contains a -2.x suffix which we don't need.
+    Go into wx.mod/lib/<build>/wx/include/
+    You'll see something like mac-unicode-release-static-2.8
+    Remove the -2.8, so that it becomes mac-unicode-release-static
+
+
+    For PPC build on Intel
+
+        export CPPFLAGS="-arch ppc"
+        export LDFLAGS="-arch ppc"
+        ./configure --enable-unicode --with-opengl --enable-mediactrl --enable-graphics_ctx --disable-shared --with-expat=builtin --with-libjpeg=builtin --with-libpng=builtin --with-macosx-sdk=/Developer/SDKs/MacOSX10.4u.sdk --with-macosx-version-min=10.4
+
+        make
+
+
+Win32 :
+
+    wxMSW 3.1.x
+    
+    edit build/msw/config.gcc, and change the following entries :
+            BUILD := release
+            UNICODE = 1
+            USE_OPENGL = 1
+            USE_GDIPLUS := 1               <- this option doesn't appear in the latest config. May be enabled by default.
+
+			# Standard flags for CC 
+			CFLAGS ?= -DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES
+
+			# Standard flags for C++ 
+			CXXFLAGS ?= -DZ_PREFIX -DWXWIDGETS_JPEG_EXTERNAL_NAMES
+
+
+    Also, edit wx/msw/setup0.h and enable wxUSE_GLCANVAS :
+            #define wxUSE_GLCANVAS       1
+            #define wxUSE_GRAPHICS_CONTEXT 1
+            #define wxUSE_STD_IOSTREAM  0
+
+    NOTE : These two definitions will appear in the setup.h inside the lib folder. If you failed to set them initially when building, you should
+    apply the changes to setup.h also.
+
+    make -f makefile.gcc
+
+    creates static .a files in lib\gcc_lib
+
+	Also need to include libwinspool.a, librpcrt4.a and libodbc32.a in the lib folder for distribution. (these come from
+	the MinGW distribution)
+    
+	NOTE : if you get an error building, which mentions an invalid abs( &double) call in graphics.cpp, you can change the
+	errored call to use fabs instead :
+
+          if( fabs(sweepAngle) >= 2*M_PI)
+
+    NOTES on wxUSE_STD_IOSTREAM : 2.9.0 appears to set this to 1 by default on Win32 now. Except that it breaks (at least) wxDocument SaveObject()
+    so, I'm building with this disabled in order to use wx streams instead of c++ iostreams - which is better for BlitzMax.
+
+
+	Resource file compilation
+	-------------------------
+	
+	wx_rc.o resource file is compiled into the binaries.
+	From the main wxWidgets folder, you can run this command to regenerate the wx_rx.o file :
+		PATH_TO_MINGW\bin\windres -i include\wx\msw\wx.rc -o wx_rc.o -Iinclude 
+		
+	If using 64-bit MINGW, you need to add the following to build a 32-bit res file :
+		-F pe-i386
+		
+	Otherwise, it will build 64-bit by default.
+
+------------------------------------------------------------
+
+wxWidgets code changes
+======================
+
+Changes made to the supplied source to improve things when used with BlitzMax.
+
+All Platforms
+-------------
+
+src/jpeg/jpeglib.h
+
+Add this text for wx-specific function prefixes :
+
+/* BaH - wx_ prefix */
+#ifdef WXWIDGETS_JPEG_EXTERNAL_NAMES
+#define jpeg_std_error	wx_jpeg_std_error
+#define jpeg_CreateCompress	wx_jpeg_CreateCompress
+#define jpeg_CreateDecompress	wx_jpeg_CreateDecompress
+#define jpeg_destroy_compress	wx_jpeg_destroy_compress
+#define jpeg_destroy_decompress	wx_jpeg_destroy_decompress
+#define jpeg_stdio_dest	wx_jpeg_stdio_dest
+#define jpeg_stdio_src	wx_jpeg_stdio_src
+#define jpeg_mem_dest	wx_jpeg_mem_dest
+#define jpeg_mem_src	wx_jpeg_mem_src
+#define jpeg_set_defaults	wx_jpeg_set_defaults
+#define jpeg_set_colorspace	wx_jpeg_set_colorspace
+#define jpeg_default_colorspace	wx_jpeg_default_colorspace
+#define jpeg_set_quality	wx_jpeg_set_quality
+#define jpeg_set_linear_quality	wx_jpeg_set_linear_quality
+#define jpeg_default_qtables	wx_jpeg_default_qtables
+#define jpeg_add_quant_table	wx_jpeg_add_quant_table
+#define jpeg_quality_scaling	wx_jpeg_quality_scaling
+#define jpeg_simple_progression	wx_jpeg_simple_progression
+#define jpeg_suppress_tables	wx_jpeg_suppress_tables
+#define jpeg_alloc_quant_table	wx_jpeg_alloc_quant_table
+#define jpeg_alloc_huff_table	wx_jpeg_alloc_huff_table
+#define jpeg_start_compress	wx_jpeg_start_compress
+#define jpeg_write_scanlines	wx_jpeg_write_scanlines
+#define jpeg_finish_compress	wx_jpeg_finish_compress
+#define jpeg_calc_jpeg_dimensions	wx_jpeg_calc_jpeg_dimensions
+#define jpeg_write_raw_data	wx_jpeg_write_raw_data
+#define jpeg_write_marker	wx_jpeg_write_marker
+#define jpeg_write_m_header	wx_jpeg_write_m_header
+#define jpeg_write_m_byte	wx_jpeg_write_m_byte
+#define jpeg_write_tables	wx_jpeg_write_tables
+#define jpeg_read_header	wx_jpeg_read_header
+#define jpeg_start_decompress	wx_jpeg_start_decompress
+#define jpeg_read_scanlines	wx_jpeg_read_scanlines
+#define jpeg_finish_decompress	wx_jpeg_finish_decompress
+#define jpeg_read_raw_data	wx_jpeg_read_raw_data
+#define jpeg_has_multiple_scans	wx_jpeg_has_multiple_scans
+#define jpeg_start_output	wx_jpeg_start_output
+#define jpeg_finish_output	wx_jpeg_finish_output
+#define jpeg_input_complete	wx_jpeg_input_complete
+#define jpeg_new_colormap	wx_jpeg_new_colormap
+#define jpeg_consume_input	wx_jpeg_consume_input
+#define jpeg_core_output_dimensions	wx_jpeg_core_output_dimensions
+#define jpeg_calc_output_dimensions	wx_jpeg_calc_output_dimensions
+#define jpeg_save_markers	wx_jpeg_save_markers
+#define jpeg_set_marker_processor	wx_jpeg_set_marker_processor
+#define jpeg_read_coefficients	wx_jpeg_read_coefficients
+#define jpeg_write_coefficients	wx_jpeg_write_coefficients
+#define jpeg_copy_critical_parameters	wx_jpeg_copy_critical_parameters
+#define jpeg_abort_compress	wx_jpeg_abort_compress
+#define jpeg_abort_decompress	wx_jpeg_abort_decompress
+#define jpeg_abort	wx_jpeg_abort
+#define jpeg_destroy	wx_jpeg_destroy
+#define jpeg_resync_to_restart	wx_jpeg_resync_to_restart
+#define jpeg_std_message_table wx_jpeg_std_message_table
+#define jinit_marker_reader wx_jinit_marker_reader
+#endif /* WXWIDGETS_JPEG_EXTERNAL_NAMES */
+
+
+
+Current version of wxWidgets already sets this...
+
+src/zlib/zconf.h
+
+Add this text for wx-specific function prefix to the ifdef Z_PREFIX section :
+
+/* BaH */
+#define z_errmsg wx_zlib_errmsg
+
+
+
+OS X
+-----
+
+src/osx/cocoa/utils.mm
+
+in function wxApp::CallOnInit(), comment out call to NSApp run, because it hangs processing..
+
+	// BaH - this hangs in 3.0.0 - but it worked in 2.9.5...
+	//    [NSApp run];
+

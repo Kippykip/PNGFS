@@ -1,0 +1,500 @@
+<html><head><title>Widgets II</title>
+
+
+<link rel="stylesheet" href="../media/format.css" type="text/css">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="keywords" content="wxWidgets, tutorial, widgets, C++, programming, GUI, multiplatform">
+<meta nam="description" content="Widgets II">
+<meta name="language" content="en">
+<meta name="author" content="jan bodnar">
+<meta name="distribution" content="global"></head><body>
+
+
+<div class="center">
+
+<div>&nbsp;
+<a href="index.html">Contents</a></div>
+
+
+
+<h1>Widgets II</h1>
+
+<p>
+In this chapter, we will continue introducing various other widgets. 
+</p>
+
+
+<h3>wxListBox</h3>
+
+<p>
+A wxListBox widget is used for displaying and working with a list of
+items. As it's name indicates, it is a rectangle that has a list of
+strings inside. We could use it for displaying a list of mp3 files,
+book names, module names of a larger project or names of our friends. A
+wxListBox can be created in two different states. In a single selection
+state or a multiple selection state. The single selection state is the
+default state. There are two significant events in wxListBox. The first
+one is the wxEVT_COMMAND_LISTBOX_SELECTED event. This event is
+generated when we select a string in a wxListBox. The second one is the
+wxEVT_COMMAND_LISTBOX_DOUBLE_CLICKED event. It is generated when we
+double click an item in a wxListBox. The number of elements inside a
+wxListBox is limited on GTK platform. According to the documentation,
+it is currently around 2000 elements. The elements are numbered from
+zero. Scrollbars are displayed automatically if needed.
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/listbox.bmx">listbox.bmx</a> &lt;- Open source</div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxPanel
+Import wx.wxListBox
+Import wx.wxTextEntryDialog
+ 
+Const ID_RENAME:Int = 1
+Const ID_LISTBOX:Int = 5
+
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local lb:TListbox = TListbox(New TListbox.Create(Null, wxID_ANY, ..
+			"Simple", -1, -1, 270, 200))
+		lb.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type TListbox Extends wxFrame
+
+	Field listbox:wxListBox
+	Field btnPanel:MyPanel
+ 
+	Method OnInit()
+		
+		Local panel:wxPanel = New wxPanel.Create(Self, -1)
+		
+		Local hbox:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		
+		listbox = New wxListBox.Create(panel, ID_LISTBOX, ..
+			Null, -1, -1, -1, -1)
+		
+		hbox.Add(listbox, 3, wxEXPAND | wxALL, 20)		
+		btnPanel = MyPanel(New MyPanel.Create(panel))
+		hbox.Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10)
+		
+		ConnectAny(wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, OnDblClick)
+		
+		panel.SetSizer(hbox)
+
+		Centre()
+ 
+	End Method
+	
+	Function OnDblClick(event:wxEvent)
+		Local lb:TListBox = TListBox(event.parent)
+	
+		Local renamed:String
+		
+		Local sel:Int = lb.listbox.GetSelection()
+		If sel <> -1 Then
+		    renamed = wxGetTextFromUser("Rename item", ..
+				"Rename dialog", lb.listbox.GetString(sel))
+		End If
+		
+		If renamed Then
+		    lb.listbox.DeleteItem(sel)
+		    lb.listbox.Insert(renamed, sel)
+		End If
+	End Function
+	
+End Type
+
+Type MyPanel Extends wxPanel
+
+	Field m_lb:wxListBox
+	
+	Field m_newb:wxButton
+	Field m_renameb:wxButton
+	Field m_clearb:wxButton
+	Field m_deleteb:wxButton
+
+	Method OnInit()
+		Local vbox:wxBoxSizer = New wxBoxSizer.Create(wxVERTICAL)
+		
+		Local lb:TListbox = TListbox(GetParent().GetParent())
+		m_lb = lb.listbox
+		
+		m_newb = New wxButton.Create(Self, wxID_NEW, "New")
+		m_renameb = New wxButton.Create(Self, ID_RENAME, "Rename")
+		m_deleteb = New wxButton.Create(Self, wxID_DELETE, "Delete")
+		m_clearb = New wxButton.Create(Self, wxID_CLEAR, "Clear")
+		
+		Connect(wxID_NEW, wxEVT_COMMAND_BUTTON_CLICKED, OnNew)
+		Connect(ID_RENAME, wxEVT_COMMAND_BUTTON_CLICKED, OnRename)
+		Connect(wxID_CLEAR, wxEVT_COMMAND_BUTTON_CLICKED, OnClear)
+		Connect(wxID_DELETE, wxEVT_COMMAND_BUTTON_CLICKED, OnDelete)
+		
+		vbox.AddCustomSpacer(-1, 20)
+		vbox.Add(m_newb)
+		vbox.Add(m_renameb, 0, wxTOP, 5)
+		vbox.Add(m_deleteb, 0, wxTOP, 5)
+		vbox.Add(m_clearb, 0, wxTOP, 5)
+		
+		SetSizer(vbox)
+	End Method
+	
+	Function OnNew(event:wxEvent)
+		Local s:String = wxGetTextFromUser("Add new item")
+		If s Then
+			MyPanel(event.parent).m_lb.Append(s)
+		End If
+	End Function
+
+	Function OnRename(event:wxEvent)
+		Local pnl:MyPanel = MyPanel(event.parent)
+
+		Local renamed:String
+		
+		Local sel:Int = pnl.m_lb.GetSelection()
+		If sel <> -1 Then
+			renamed = wxGetTextFromUser("Rename item", ..
+				"Rename dialog", pnl.m_lb.GetString(sel))
+		End If
+		
+		If renamed Then
+			pnl.m_lb.DeleteItem(sel)
+			pnl.m_lb.Insert(renamed, sel)
+		End If
+	End Function
+
+	Function OnClear(event:wxEvent)
+		MyPanel(event.parent).m_lb.Clear()
+	End Function
+
+	Function OnDelete(event:wxEvent)
+		Local pnl:MyPanel = MyPanel(event.parent)
+	
+		Local sel:Int = pnl.m_lb.GetSelection()
+		If sel <> -1 Then
+			pnl.m_lb.DeleteItem(sel)
+		End If
+	End Function
+	
+End Type
+</pre>
+<br>
+
+<pre class="explanation"> listbox = New wxListBox.Create(panel, ID_LISTBOX, Null, -1, -1, -1, -1)
+</pre>
+
+<p>
+This is the constructor of the listbox widget.
+</p>
+
+<p>
+In our example, we have a list box and four buttons. The buttons are used to add, rename, delete and clear all items in 
+the listbox.
+</p>
+
+<pre class="explanation"> Local s:String = wxGetTextFromUser("Add new item")
+ If s Then
+     m_lb.Append(str)
+ End If
+</pre>
+
+<p>
+To add a new string to the listbox, we display a <i>wxGetTextFromUser</i> dialog. We call the <i>Append()</i> method to 
+append string to the listbox.
+</p>
+
+<pre class="explanation"> m_lb.Clear()
+</pre>
+
+<p>
+To clear all items is the easiest action to do. We just call the <i>Clear()</i> method.
+</p>
+
+<pre class="explanation"> Local sel:Int = m_lb.GetSelection()
+ If sel &lt;&gt; -1 Then
+     m_lb.DeleteItem(sel)
+ End If
+</pre>
+
+<p>
+To delete an item, we figure out the selected item. Then we call the <i>Delete()</i> method.
+</p>
+
+<p>
+Renaming an item requires several steps.</p>
+
+<pre class="explanation"> Local renamed:String
+ Local sel:Int = m_lb.GetSelection()
+ If sel &lt;&gt; -1 Then
+     renamed = wxGetTextFromUser("Rename item", ..
+     	"Rename dialog", m_lb.GetString(sel))
+ End If
+</pre>
+
+<p>
+We get the selected string and save it to the renamed variable.
+</p>
+
+<pre class="explanation"> If renamed Then
+     m_lb.DeleteItem(sel)
+     m_lb.Insert(renamed, sel)
+ End If
+</pre>
+
+<p>
+We check whether the renamed variable is empty. This is to avoid inserting empty strings. Then we delete the old item and
+insert a new one.
+</p>
+
+
+<br>
+<img src="../media/listbox.jpg" alt="Listbox">
+<div class="figure">Figure: Listbox </div>
+
+
+<h3>wxNotebook</h3>
+
+<p>
+wxNotebook widget joins multiple windows with corresponding tabs. 
+You can position the Notebook widget using the following style flags: 
+</p><ul>
+<li>wxNB_LEFT</li>
+<li>wxNB_RIGHT</li> 
+<li>wxNB_TOP</li> 
+<li>wxNB_BOTTOM</li> 
+</ul>
+The default position is wxNB_TOP.
+<p></p>
+
+<pre class="code"><div class="codehead"><a href="../examples/notebook.bmx">notebook.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxNotebook
+Import wx.wxSheet
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local sim:Notebook = Notebook(New Notebook.Create(Null, wxID_ANY, ..
+			"Notebook", -1, -1, 400, 350))
+		sim.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Notebook Extends wxFrame
+ 
+	Method OnInit()
+		
+		Local nb:wxNotebook = New wxNotebook.Create(Self, -1, ..
+			-1, -1, -1, -1, wxNB_BOTTOM)
+		
+		Local menubar:wxMenuBar = New wxMenuBar.Create()
+		Local file:wxMenu = New wxMenu.Create()
+		file.Append(wxID_CLOSE, "Quit", "")
+		menubar.Append(file, "&File")
+		SetMenuBar(menubar)
+		
+		ConnectAny(wxEVT_COMMAND_MENU_SELECTED, OnQuit)
+		
+		Local grid1:MySheet = MySheet(New MySheet.Create(nb, -1))
+		Local grid2:MySheet = MySheet(New MySheet.Create(nb, -1))
+		Local grid3:MySheet = MySheet(New MySheet.Create(nb, -1))
+		
+		nb.AddPage(grid1, "Sheet1")
+		nb.AddPage(grid2, "Sheet2")
+		nb.AddPage(grid3, "Sheet3")
+		
+		CreateStatusBar()
+		
+		Centre()
+ 
+	End Method
+	
+	Function OnQuit(event:wxEvent)
+		wxWindow(event.parent).Close(True)
+	End Function
+	
+End Type
+
+Type MySheet Extends wxSheet
+
+	Method OnInit()
+		CreateGrid(30, 30)
+		SetRowLabelWidth(50)
+		SetColLabelHeight(25)
+		Local attr:wxSheetCellAttr = GetDefaultRowLabelAttr()
+		attr.SetAlignmentHV(wxALIGN_RIGHT, wxALIGN_CENTRE)
+		attr.SetFont(New wxFont.CreateWithAttribs(9, ..
+			wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD))
+		
+		For Local i:Int = 0 Until 30
+		    SetRowHeight(i, 25)
+		Next
+	End Method
+
+End Type
+</pre>
+
+<br>
+
+<p>
+In this example, we have created a notebook widget with three sheets. The notebook widget is positioned at the 
+bottom.
+</p>
+
+
+<pre class="explanation"> Local nb:wxNotebook = New wxNotebook.Create(Self, -1, -1, -1, .. 
+      -1, -1, wxNB_BOTTOM)
+</pre>
+
+<p>
+Here we create the notebook widget. 
+</p>
+
+<pre class="explanation"> nb.AddPage(sheet1, "Sheet1")
+ nb.AddPage(sheet2, "Sheet2")
+ nb.AddPage(sheet3, "Sheet3")
+</pre>
+
+<p>
+We add three sheet objects into the notebook widget. 
+</p>
+
+<br>
+<img src="../media/notebook.jpg" alt="Notebook">
+<div class="figure">Figure: Notebook widget </div>
+
+
+<h3>wxScrolledWindow</h3>
+
+<p>This is one of the container widgets. It can be useful, when we have
+a larger area than a window can display. In our example, we demonstrate
+such a case. We place a large image into our window. When the window is
+smaller than our image, Scrollbars are displayed automatically.
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/scrolledwindow.bmx">scrolledwindow.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxScrolledWindow
+Import wx.wxStaticBitmap
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local sim:ScrolledWindow = ScrolledWindow(New ScrolledWindow.Create(Null, wxID_ANY, ..
+			"ScrolledWindow", -1, -1, 300, 200))
+		sim.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type ScrolledWindow Extends wxFrame
+ 
+	Method OnInit()
+		
+		wxImage.AddHandler(New wxJPEGHandler)
+		
+		Local sw:wxScrolledWindow = New wxScrolledWindow.Create(Self)
+		
+		Local bmp:wxBitmap = New wxBitmap.CreateFromFile("../media/castle.jpg", wxBITMAP_TYPE_JPEG)
+		Local sb:wxStaticBitmap = New wxStaticBitmap.Create(sw, -1, bmp)
+		
+		Local width:Int = bmp.GetWidth()
+		Local height:Int = bmp.GetHeight()
+		
+		sw.SetScrollbars(10, 10, width/10, height/10)
+		sw.Scroll(20, 5)
+
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+
+<br>
+
+<p>
+In our example, we display a picture of a Spis castle. 
+</p>
+
+<pre class="explanation"> wxImage.AddHandler(New wxJPEGHandler)
+</pre>
+
+<p>
+To handle jpg images, we must initiate the <i>wxJPEGHandler</i>.
+</p>
+
+<pre class="explanation"> Local sw:wxScrolledWindow = New wxScrolledWindow.Create(Self)
+
+ Local bmp:wxBitmap = New wxBitmap.CreateFromFile("castle.jpg", wxBITMAP_TYPE_JPEG)
+ Local sb:wxStaticBitmap = New wxStaticBitmap.Create(sw, -1, bmp)
+</pre>
+
+<p>
+We create a scroll window and put a static bitmap into it.
+</p>
+
+<pre class="explanation"> sw.SetScrollbars(10, 10, width/10, height/10)
+</pre>
+
+<p>
+We set the scrollbars. 
+</p>
+
+<pre class="explanation"> sw.Scroll(20, 5)
+</pre>
+
+<p>
+We scroll the window a bit.
+</p>
+
+
+<br>
+<img src="../media/scrolledwindow.jpg" alt="Scrolled Window">
+<div class="figure">Figure: Scrolled Window </div>
+
+
+<br>
+
+<br>
+
+
+<center>
+<div class="botNav"><span class="botNavItem"><a href="index.html">Contents</a></span> ‡ <span class="botNavItem"><a href="#">Top of Page</a></span></div>
+</center>
+
+<div class="footer">
+<div class="signature"><span class="copyright">© 2007 Jan Bodnar</span><br>
+<span class="copyright"> Adapted for BlitzMax by Bruce A Henderson</span></div>
+</div>
+
+</div>
+</body></html>

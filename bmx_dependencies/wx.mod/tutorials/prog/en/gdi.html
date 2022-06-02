@@ -1,0 +1,736 @@
+<html><head><title>Device Contexts</title>
+
+
+<link rel="stylesheet" href="../media/format.css" type="text/css">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="keywords" content="wxWidgets, tutorial, First programs, C++, programming, GUI, Device Contexts, multiplatform">
+<meta nam="description" content="Introduction to winapi">
+<meta name="language" content="en">
+<meta name="author" content="jan bodnar">
+<meta name="distribution" content="global"></head><body>
+
+
+<div class="center">
+
+<div>&nbsp;
+<a href="index.html">Contents</a></div>
+
+<h1>Device Contexts</h1>
+
+<p>
+The <b>GDI</b> (<b>Graphics Device Interface</b>) is an interface
+for working with graphics. It is used to interact with graphic devices
+such as monitor, printer or a file. The GDI allows programmers to
+display data on a screen or printer without having to be concerned
+about the details of a particular device. The GDI insulates the
+programmer from the hardware. </p>
+
+<br>
+<img src="../media/gdi.png" alt="The GDI">
+<div class="figure">Figure: The GDI structure</div>
+
+<p>
+From the programmer's point of view, the GDI is a group of classes and
+methods for working with graphics. The GDI consists of 2D Vector
+Graphics, Fonts and Images.
+</p>
+<p>To begin drawing graphics, we must create a device context (DC)
+object. In wxWidgets the device context is called wxDC. The
+documentation defines wxDC as a device context onto which which
+graphics and text can be drawn. It represents number of devices in a
+generic way. Same piece of code can write to different kinds of
+devices. Be it a screen or a printer. The wxDC is not intended to be
+used directly. Instead a programmer should choose one of the derived
+classes. Each derived class is intended to be used under specific
+conditions.
+</p>
+
+<p>
+Derived wxDC classes
+</p>
+
+<ul>
+<li>wxBufferedDC</li>
+<li>wxBufferedPaintDC</li>
+<li>wxPostScriptDC</li>
+<li>wxMemoryDC</li>
+<li>wxPrinterDC</li>
+<li>wxScreenDC</li>
+<li>wxClientDC</li>
+<li>wxPaintDC</li>
+<li>wxWindowDC</li>
+</ul>
+
+<p>The wxScreenDC is used to draw anywhere on the screen. The
+wxWindowDC is used if we want to paint on the whole window (Windows
+only). This includes window decorations. The wxClientDC is used to draw
+on the client area of a window. The client area is the area of a window
+without it's decorations (title and border). The wxPaintDC is used to
+draw on the client area as well. But there is one difference between
+the wxPaintDC and the wxClientDC. The wxPaintDC should be used only
+from a wxPaintEvent. The wxClientDC shoud not be used from a
+wxPaintEvent. The wxMemoryDC is used to draw graphics on the bitmap.
+The wxPostScriptDC is used to write to PostScript files on any
+platform. The wxPrinterDC is used to access a printer. </p>
+
+
+<h4>Simple line</h4>
+
+<p>
+We begin with drawing a line.
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/line.bmx">line.bmx</a> &lt;- Open source</div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local ln:Line = Line(New Line.Create(Null, wxID_ANY, ..
+			"Line", -1, -1, 280, 180))
+		ln.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Line Extends wxFrame
+ 
+	Method OnInit()
+		
+		ConnectAny(wxEVT_PAINT, OnPaint)
+		Centre()
+ 
+	End Method
+	
+	Function OnPaint(event:wxEvent)
+
+		Local dc:wxPaintDC = New wxPaintDC.Create(wxWindow(event.parent))
+		
+		Local x1:Int = 50,  y1:Int = 60
+		Local x2:Int = 190, y2:Int = 60
+		
+		dc.DrawLine(x1, y1, x2, y2)
+		
+		dc.Free()
+	End Function
+	
+End Type
+</pre>
+<p>
+In our example, we draw a simple line onto the client area of the window. If we resize the window, it is redrawn. 
+An <i>wxPaintEvent</i> is generated. And the line is drawn again. 
+</p>
+
+<pre class="explanation"> Function OnPaint(event:wxEvent)
+</pre>
+
+<p>
+Here we declare a <i>OnPaint()</i> event handler function. 
+</p>
+
+<pre class="explanation"> ConnectAny(wxEVT_PAINT, OnPaint)</pre>
+
+<p>
+We connect a paint event to the <i>OnPaint()</i> method. All the drawing happens inside the <i>OnPaint()</i> event handler.
+</p>
+
+<pre class="explanation"> Local dc:wxPaintDC = New wxPaintDC.Create(wxWindow(event.parent))
+</pre>
+
+<p>
+We define a <i>wxPaintDC</i> device context. It is a device context, that is used to draw on the window inside the
+<i>wxPaintEvent</i>
+</p>
+
+<pre class="explanation"> Local x1:Int = 50,  y1:Int = 60
+ Local x2:Int = 190, y2:Int = 60</pre>
+
+<p>
+We define four coordinates.
+</p>
+
+<pre class="explanation">  dc.DrawLine(x1, y1, x2, y2)
+</pre>
+
+<p>
+We draw a simple line calling the <i>DrawLine()</i> method.
+</p>
+<pre class="explanation">  dc.Free()
+</pre>
+
+<p>
+Finally, we call the <i>Free()</i> method to close and free the device context.
+</p>
+
+<br>
+<img src="../media/line.jpg" alt="Line">
+<div class="figure">Figure: A simple line</div>
+
+
+
+<h4>Drawing text</h4>
+
+<p>
+Drawing some text on the window is easy.
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/text.bmx">text.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local txt:Text = Text(New Text.Create(Null, wxID_ANY, ..
+			"Text", -1, -1, 250, 150))
+		txt.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Text Extends wxFrame
+ 
+	Method OnInit()
+		
+		ConnectAny(wxEVT_PAINT, OnPaint)
+		Centre()
+ 
+	End Method
+	
+	Function OnPaint(event:wxEvent)
+
+		Local dc:wxPaintDC = New wxPaintDC.Create(wxWindow(event.parent))
+		
+		dc.DrawText("Лев Николaевич Толстoй", 40, 60)
+		dc.DrawText("Анна Каренина", 70, 80)
+	
+		dc.Free()
+	End Function
+	
+End Type
+</pre>
+
+<p>
+In our example, we draw text Lev Nikolayevich Tolstoy, Anna Karenina in russian azbuka onto the window.
+</p>
+
+
+<pre class="explanation">  dc.DrawText("Лев Николaевич Толстoй", 40, 60)
+  dc.DrawText("Анна Каренина", 70, 80)
+</pre>
+
+<p>
+The <i>DrawText()</i> method draws text on the window. It Draws a
+text string at the specified point, using the current text font, and
+the current text foreground and background colours.</p>
+
+
+<br>
+<img src="../media/text.jpg" alt="Drawing text">
+<div class="figure">Figure: Drawing text</div>
+
+
+
+<h4>Point</h4>
+
+<p>
+The simplest geometrical object is a point. It is a plain dot on the window.
+</p>
+<pre class="definition"> DrawPoint(x:Int, y:Int)
+</pre>
+<p>
+This method draws a point at x, y coordinates. 
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/points.bmx">points.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import BRL.Random
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local pts:Points = Points(New Points.Create(Null, wxID_ANY, ..
+			"Points", -1, -1, 250, 150))
+		pts.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Points Extends wxFrame
+ 
+	Method OnInit()
+		
+		SeedRnd(MilliSecs())
+		ConnectAny(wxEVT_PAINT, OnPaint)
+		Centre()
+ 
+	End Method
+	
+	Function OnPaint(event:wxEvent)
+		Local this:Points = Points(event.parent)
+
+		Local dc:wxPaintDC = New wxPaintDC.Create(this)
+		
+		Local x:Int = 0
+		Local y:Int = 0
+		
+		Local width:Int, height:Int
+		this.GetSize(width, height)
+		
+		For Local i:Int = 0 Until 1000
+		    x = Rand(0, width) + 1
+		    y = Rand(0, height) + 1
+		    dc.DrawPoint(x, y)
+		Next
+	
+		dc.Free()
+	End Function
+	
+End Type
+</pre>
+
+<br>
+<p>
+ A single point might be difficult to see. So we create 1000 points. Each time the window is resized, we draw 
+the 1000 points over the client area of the window.
+</p>
+
+<pre class="explanation">  wxSize size = this-&gt;GetSize();
+</pre>
+
+<p>
+Here we get the size of the window. 
+</p>
+
+<pre class="explanation"> x = rand() % size.x + 1;
+</pre>
+
+<p>
+ Here we get a random number in the range of 1 to size.x.
+</p>
+
+<br>
+<img src="../media/points.jpg" alt="Points">
+<div class="figure">Figure: Points</div>
+
+
+
+
+
+<h4>Pen</h4>
+
+<p>Pen is an elementary graphics object. It is used to draw lines,
+curves and outlines of rectangles, ellipses, polygons or other shapes.
+</p>
+
+
+<pre class="definition"> wxPen.CreateFromColour(colour:wxColour, width:Int = 1, style:Int = wxSOLID)
+</pre>
+
+
+<p>
+The wxPen constructor has three parameters. Colour, width and style. Follows a list of possible pen styles.
+Pen styles
+</p>
+
+<ul>
+<li>wxSOLID</li>
+<li>wxDOT</li>
+<li>wxLONG_DASH</li>
+<li>wxSHORT_DASH</li>
+<li>wxDOT_DASH</li>
+<li>wxTRANSPARENT</li>
+</ul>
+
+<pre class="code"><div class="codehead"><a href="../examples/pen.bmx">pen.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local p:Pen = Pen(New Pen.Create(Null, wxID_ANY, ..
+			"Pen", -1, -1, 360, 200))
+		p.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Pen Extends wxFrame
+ 
+	Method OnInit()
+		
+		ConnectAny(wxEVT_PAINT, OnPaint)
+		Centre()
+ 
+	End Method
+	
+	Function OnPaint(event:wxEvent)
+		Local dc:wxPaintDC = New wxPaintDC.Create(wxWindow(event.parent))
+		
+		Local col1:wxColour = New wxColour.CreateNamedColour("#0c0c0c")
+		Local col2:wxColour = New wxColour.CreateNamedColour("#000000")
+		
+		Local brush:wxBrush = New wxBrush.CreateFromColour(..
+			New wxColour.Create(255, 255, 255), wxTRANSPARENT)
+		dc.SetBrush(brush)
+		
+		dc.SetPen(New wxPen.CreateFromColour(col1, 1, wxSOLID))
+		dc.DrawRectangle(10, 15, 90, 60)
+		
+		dc.SetPen(New wxPen.CreateFromColour(col1, 1, wxDOT))
+		dc.DrawRectangle(130, 15, 90, 60)
+		
+		dc.SetPen(New wxPen.CreateFromColour(col1, 1, wxLONG_DASH))
+		dc.DrawRectangle(250, 15, 90, 60)
+		
+		dc.SetPen(New wxPen.CreateFromColour(col1, 1, wxSHORT_DASH))
+		dc.DrawRectangle(10, 105, 90, 60)
+		
+		dc.SetPen(New wxPen.CreateFromColour(col1, 1, wxDOT_DASH))
+		dc.DrawRectangle(130, 105, 90, 60)
+		
+		dc.SetPen(New wxPen.CreateFromColour(col1, 1, wxTRANSPARENT))
+		dc.DrawRectangle(250, 105, 90, 60)
+	
+		dc.Free()
+	End Function
+	
+End Type
+</pre>
+
+<br>
+<p>
+In our example, we draw 6 rectangles with different pen styles. The last one is transparent, not visible. 
+</p>
+
+<pre class="explanation"> dc.SetPen(New wxPen.CreateFromColour(col1, 1, wxSOLID))
+ dc.DrawRectangle(10, 15, 90, 60)
+</pre>
+
+<p>
+Here we define a pen for our first rectangle. We set a pen with color col1 (#0c0c0c), 1 pixel wide, solid. 
+The <i>DrawRectangle()</i> method draws the rectangle.
+</p>
+
+
+<br>
+<img src="../media/pen.jpg" alt="Pen">
+<div class="figure">Figure: Pen</div>
+
+
+<h4>Regions</h4>
+
+<p>
+Regions can be combined to create more complex shapes. We can use four set operations. <i>Union</i>, <i>Intersect</i>, <i>Substract</i> and <i>Xor</i>.
+
+The following example shows all four operations in action. 
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/regions.bmx">regions.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local rgn:Regions = Regions(New Regions.Create(Null, wxID_ANY, ..
+			"Regions", -1, -1, 270, 220))
+		rgn.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Regions Extends wxFrame
+ 
+	Method OnInit()
+		
+		ConnectAny(wxEVT_PAINT, OnPaint)
+		Centre()
+ 
+	End Method
+	
+	Function OnPaint(event:wxEvent)
+
+		Local dc:wxPaintDC = New wxPaintDC.Create(wxWindow(event.parent))
+		
+		Local gray:wxColour = New wxColour.CreateNamedColour("#d4d4d4")
+		Local white:wxColour = New wxColour.CreateNamedColour("#ffffff")
+		Local red:wxColour = New wxColour.CreateNamedColour("#ff0000")
+		Local orange:wxColour = New wxColour.CreateNamedColour("#fa8e00")
+		Local green:wxColour = New wxColour.CreateNamedColour("#619e1b")
+		Local brown:wxColour = New wxColour.CreateNamedColour("#715b33")
+		Local blue:wxColour = New wxColour.CreateNamedColour("#0d0060")
+		
+		dc.SetPen(New wxPen.CreateFromColour(gray))
+		
+		dc.DrawRectangle(20, 20, 50, 50)
+		dc.DrawRectangle(30, 40, 50, 50)
+		
+		dc.SetBrush(New wxBrush.CreateFromColour(white))
+		dc.DrawRectangle(100, 20, 50, 50)
+		dc.DrawRectangle(110, 40, 50, 50) 
+		Local region1:wxRegion = New wxRegion.Create(100, 20, 50, 50)
+		Local region2:wxRegion = New wxRegion.Create(110, 40, 50, 50)
+		region1.IntersectRegion(region2)
+		Local rect1:wxRect = region1.GetBoxRect()
+		dc.SetClippingRegionRegion(region1)
+		dc.SetBrush(New wxBrush.CreateFromColour(red))
+		dc.DrawRectangleRect(rect1)
+		dc.DestroyClippingRegion()
+		
+		dc.SetBrush(New wxBrush.CreateFromColour(white))
+		dc.DrawRectangle(180, 20, 50, 50)
+		dc.DrawRectangle(190, 40, 50, 50)
+		Local region3:wxRegion = New wxRegion.Create(180, 20, 50, 50)
+		Local region4:wxRegion = New wxRegion.Create(190, 40, 50, 50)
+		region3.UnionRegion(region4)
+		dc.SetClippingRegionRegion(region3)
+		Local rect2:wxRect = region3.GetBoxRect()
+		dc.SetBrush(New wxBrush.CreateFromColour(orange))
+		dc.DrawRectangleRect(rect2)
+		dc.DestroyClippingRegion()
+		
+		dc.SetBrush(New wxBrush.CreateFromColour(white))
+		dc.DrawRectangle(20, 120, 50, 50)
+		dc.DrawRectangle(30, 140, 50, 50)
+		Local region5:wxRegion = New wxRegion.Create(20, 120, 50, 50)
+		Local region6:wxRegion = New wxRegion.Create(30, 140, 50, 50)
+		region5.XorRegion(region6)
+		Local rect3:wxRect = region5.GetBoxRect()
+		dc.SetClippingRegionRegion(region5)
+		dc.SetBrush(New wxBrush.CreateFromColour(green))
+		dc.DrawRectangleRect(rect3)
+		dc.DestroyClippingRegion()
+		
+		dc.SetBrush(New wxBrush.CreateFromColour(white))
+		dc.DrawRectangle(100, 120, 50, 50)
+		dc.DrawRectangle(110, 140, 50, 50)
+		Local region7:wxRegion = New wxRegion.Create(100, 120, 50, 50)
+		Local region8:wxRegion = New wxRegion.Create(110, 140, 50, 50)
+		region7.SubtractRegion(region8)
+		Local rect4:wxRect = region7.GetBoxRect()
+		dc.SetClippingRegionRegion(region7)
+		dc.SetBrush(New wxBrush.CreateFromColour(brown))
+		dc.DrawRectangleRect(rect4)
+		dc.DestroyClippingRegion()
+		
+		dc.SetBrush(New wxBrush.CreateFromColour(white))
+		dc.DrawRectangle(180, 120, 50, 50)
+		dc.DrawRectangle(190, 140, 50, 50)
+		Local region9:wxRegion = New wxRegion.Create(180, 120, 50, 50)
+		Local region10:wxRegion = New wxRegion.Create(190, 140, 50, 50)
+		region10.SubtractRegion(region9)
+		Local rect5:wxRect = region10.GetBoxRect()
+		dc.SetClippingRegionRegion(region10)
+		dc.SetBrush(New wxBrush.CreateFromColour(blue))
+		dc.DrawRectangleRect(rect5)
+		dc.DestroyClippingRegion() 
+			
+		dc.Free()
+	End Function
+	
+End Type
+</pre>
+
+<br>
+<img src="../media/regions.jpg" alt="Regions">
+<div class="figure">Figure: Regions</div>
+
+
+<h4>Gradient</h4>
+<p>In computer graphics, gradient is a smooth blending of shades from
+light to dark or from one color to another. In 2D drawing programs and
+paint programs, gradients are used to create colorful backgrounds and
+special effects as well as to simulate lights and shadows.
+(answers.com)
+</p>
+
+<pre class="definition">  GradientFillLinear(x:Int, y:Int, w:Int, h:Int, ..
+    initialColour:wxColour, destColour:wxColour, direction:Int = wxEAST)
+ 
+  GradientFillLinearRect(rect:wxRect, initialColour:wxColour, ..
+    destColour:wxColour, direction:Int = wxEAST)
+</pre>
+
+<p>This method fills the area specified by a rect with a linear
+gradient, starting from initialColour and eventually fading to
+destColour. The nDirection parameter specifies the direction of the
+colour change, the default value is wxEAST. </p>
+
+<pre class="code"><div class="codehead"><a href="../examples/gradient.bmx">gradient.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local txt:Gradient = Gradient(New Gradient.Create(Null, wxID_ANY, ..
+			"Gradient", -1, -1, 220, 280))
+		txt.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Gradient Extends wxFrame
+ 
+	Method OnInit()
+		
+		ConnectAny(wxEVT_PAINT, OnPaint)
+		Centre()
+ 
+	End Method
+	
+	Function OnPaint(event:wxEvent)
+
+		Local dc:wxPaintDC = New wxPaintDC.Create(wxWindow(event.parent))
+		
+		Local col1:wxColour = New wxColour.CreateNamedColour("#e12223")
+		Local col2:wxColour = New wxColour.CreateNamedColour("#000000")
+		
+		dc.GradientFillLinear(20, 20, 180, 40, col1, col2, wxNORTH)
+		dc.GradientFillLinear(20, 80, 180, 40, col1, col2, wxSOUTH)
+		dc.GradientFillLinear(20, 140, 180, 40, col1, col2, wxEAST)
+		dc.GradientFillLinear(20, 200, 180, 40, col1, col2, wxWEST)  
+	
+		dc.Free()
+	End Function
+	
+End Type
+</pre>
+
+<br>
+<img src="../media/gradient.jpg" alt="Gradient">
+<div class="figure">Figure: Gradient</div>
+
+
+
+<h4>Shapes</h4>
+
+<p>
+Shapes are more sophisticated geometrical objects. We will draw various geometrical shapes in the following example.
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/shapes.bmx">shapes.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local txt:Shapes = Shapes(New Shapes.Create(Null, wxID_ANY, ..
+			"Shapes", -1, -1, 350, 300))
+		txt.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Shapes Extends wxFrame
+ 
+	Method OnInit()
+		
+		ConnectAny(wxEVT_PAINT, OnPaint)
+		Centre()
+ 
+	End Method
+	
+	Function OnPaint(event:wxEvent)
+
+		Local dc:wxPaintDC = New wxPaintDC.Create(wxWindow(event.parent))
+		
+		Local lines:Int[] = [ 20, 260, 100, 260, 20, 210, ..
+			100, 210 ]
+		Local polygon:Int[] = [ 130, 140, 180, 170, 180, 140, ..
+			220, 110, 140, 100 ]
+		Local splines:Int[] = [ 240, 170, 280, 170, 285, 110, ..
+			325, 110 ]
+		
+		dc.DrawEllipse(20, 20, 90, 60)
+		dc.DrawRoundedRectangle(130, 20, 90, 60, 10)
+		dc.DrawArc(240, 40, 340, 40, 290, 20)
+		
+		dc.DrawPolygon(polygon)
+		dc.DrawRectangle(20, 120, 80, 50)
+		dc.DrawSpline(splines)
+		
+		dc.DrawLines(lines)
+		dc.DrawCircle(170, 230, 35)
+		dc.DrawRectangle(250, 200, 60, 60)
+	
+		dc.Free()
+	End Function
+	
+End Type
+</pre>
+
+<br>
+<img src="../media/shapes.jpg" alt="Shapes">
+<div class="figure">Figure: Shapes</div>
+
+<br>
+
+<br>
+<center>
+<div class="botNav"><span class="botNavItem"><a href="index.html">Contents</a></span> ‡ <span class="botNavItem"><a href="#">Top of Page</a></span></div>
+</center>
+
+
+
+<div class="footer">
+<div class="signature"><span class="copyright">© 2007 Jan Bodnar</span><br>
+<span class="copyright"> Adapted for BlitzMax by Bruce A Henderson</span></div>
+</div>
+
+</div>
+</body></html>

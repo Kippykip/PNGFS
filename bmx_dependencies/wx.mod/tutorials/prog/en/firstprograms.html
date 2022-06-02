@@ -1,0 +1,434 @@
+<html><head><title>First programs in wxWidgets</title>
+
+
+<link rel="stylesheet" href="../media/format.css" type="text/css">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="keywords" content="wxWidgets, tutorial, First programs, C++, programming, GUI, multiplatform">
+<meta nam="description" content="Introduction to winapi">
+<meta name="language" content="en">
+<meta name="author" content="jan bodnar">
+<meta name="distribution" content="global"></head><body>
+
+
+<div class="center">
+
+<div>
+<a href="index.html">Contents</a>
+</div>
+
+<h1>First programs in wxWidgets</h1>
+
+<p>
+In this chapter, we will cover the basics needed to create wxWidgets applications. 
+We will create our first simple example, show how to display an icon. Next we will create a simple example demonstrating
+usage of an event. Finally, we will see, how widgets communicate in wxWidgets applications.
+</p>
+
+
+<h3>A simple application</h3>
+
+<p>
+First we create the very basic wxWidgets program. 
+</p>
+
+
+<pre class="code"><div class="codehead"><a href="../examples/simple.bmx">simple.bmx</a> &lt;- Open source</div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local sim:Simple = Simple(New Simple.Create(Null, wxID_ANY, ..
+			"Simple", -1, -1, 250, 150))
+		sim.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Simple Extends wxFrame
+ 
+	Method OnInit()
+		
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+<br>
+
+<p>
+This very basic example shows a small window on the screen. The window is centered.
+</p>
+
+<pre class="explanation"> Centre()
+</pre>
+
+<p>
+This method centers the window on the screen. Both horizontally and vertically. 
+</p>
+
+<pre class="explanation">
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+	Method OnInit:Int()
+		...
+		Return True
+	End Method
+End Type
+</pre>
+
+<p>
+The wxApp type is the basic building block of a wxWidgets application. You implement a sub-type of wxApp and
+override the OnInit() method. Here you can initialize data, create windows, and perform any other startup routines for
+your application.
+</p>
+<p>
+You return True from OnInit() to indicate that the application started successfully, in which case
+wxWidgets takes control and starts processing events. If you return False, the application will terminate.
+</p>
+
+<br>
+<img src="../media/simple.jpg" alt="Simple">
+<div class="figure">Figure: Simple</div>
+
+
+
+<h3>Showing an application icon</h3>
+
+<p>
+In this example, we provide an icon for our application. It became a standard to display a small icon
+in the upper left corner of the window. The icon is a graphical identity of the program. 
+</p>
+
+
+<pre class="code"><div class="codehead"><a href="../examples/icon.bmx">icon.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxImage
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		wxImage.AddHandler( New wxPNGHandler )
+	
+		Local ic:Icon = Icon(New Icon.Create(Null, wxID_ANY, ..
+			"Icon", -1, -1, 250, 150))
+		ic.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Icon Extends wxFrame
+ 
+	Method OnInit()
+				
+		SetIcon(wxIcon.CreateFromFile("../media/world.png", wxBITMAP_TYPE_PNG))
+
+		Centre()
+ 
+	End Method
+	
+End Type
+</pre>
+
+
+<p>
+In our example we show a small web icon. 
+</p>
+
+
+<pre class="explanation">  SetIcon(wxIcon.CreateFromFile("../media/world.png", wxBITMAP_TYPE_PNG))
+</pre>
+
+<p>
+To display an application icon is a matter of one code line.
+</p>
+
+<pre class="explanation">wxImage.AddHandler( New wxPNGHandler )
+</pre>
+<p>
+AddHandler tells wxWidgets to enable certain kinds of image formats. In this case, PNG images.
+</p>
+
+<br>
+<img src="../media/icon.jpg" alt="Icon">
+<div class="figure">Figure: Icon</div>
+
+
+
+<h3>A simple button</h3>
+
+<p>
+In the following example, we create a button on the frame widget. We will show, how to create a simple event
+handler.
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/button.bmx">button.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxPanel
+Import wx.wxButton
+ 
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local btn:Button = Button(New Button.Create(Null, wxID_ANY, ..
+			"Button", -1, -1, 270, 150))
+		btn.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Button Extends wxFrame
+ 
+	Method OnInit()
+				
+		Local panel:wxPanel = New wxPanel.Create(Self, wxID_ANY)
+		
+		Local button:wxButton = New wxButton.Create(panel, wxID_EXIT, "Quit", 20, 20)
+		
+		Connect(wxID_EXIT, wxEVT_COMMAND_BUTTON_CLICKED, OnQuit)
+		button.SetFocus()
+
+		Centre()
+ 
+	End Method
+	
+	Function OnQuit(event:wxEvent)
+		wxWindow(event.parent).Close(True)
+	End Function
+	
+End Type
+</pre>
+
+
+<pre class="explanation"> Local panel:wxPanel = New wxPanel.Create(Self, wxID_ANY)
+</pre>
+
+<p>
+First we create a <i>wxPanel</i> widget. It will be placed inside a <i>wxFrame</i> widget.
+</p>
+
+<pre class="explanation"> Local button:wxButton = New wxButton.Create(panel, wxID_EXIT, "Quit", 20, 20)
+</pre>
+
+<p>
+We create a <i>wxButton</i> widget. It is placed on the panel. We use the predefined <i>wxID_EXIT</i> id for the button.
+It will cause to display a small exit icon on the button (on Linux). The label of the button is "Quit". The button is positioned
+manually at x=20, y=20 coordinates. The beginning of the coordinate system is at the upper left hand corner.
+</p>
+
+<pre class="explanation"> Connect(wxID_EXIT, wxEVT_COMMAND_BUTTON_CLICKED, OnQuit)
+</pre>
+
+<p>
+If we click on the button, a <i>wxEVT_COMMAND_BUTTON_CLICKED</i> event is generated. We connect the event to the 
+<i>OnQuit()</i> function of the Button type. So when we click on the button, the OnQuit() function is called.
+</p>
+
+<pre class="explanation"> button.SetFocus()
+</pre>
+
+<p>
+We set the keyboard focus to the button. So if we press the enter key, the button is being clicked.
+</p>
+
+<pre class="explanation"> wxWindow(event.parent).Close(True)
+</pre>
+
+<p>
+Inside the OnQuit() function, we call the <i>Close()</i> method. This will terminate our application.
+</p>
+<p>
+The event.parent field holds the widget reference which raised the event. This gives us access to
+the widget methods.
+</p>
+
+
+<br>
+<img src="../media/button.jpg" alt="Button">
+<div class="figure">Figure: Button</div>
+
+
+<h3>Widgets communicate</h3>
+
+<p>
+It is important to know, how widgets can communicate in application. Follow the next example.
+</p>
+
+<pre class="code"><div class="codehead"><a href="../examples/communicate.bmx">communicate.bmx</a></div>
+SuperStrict
+ 
+Framework wx.wxApp
+Import wx.wxFrame
+Import wx.wxPanel
+Import wx.wxButton
+Import wx.wxStaticText
+ 
+Const ID_PLUS:Int = 101
+Const ID_MINUS:Int = 102
+
+New MyApp.Run()
+ 
+Type MyApp Extends wxApp
+
+	Method OnInit:Int()
+	
+		Local btn:Communicate = Communicate(New Communicate.Create(Null, wxID_ANY, ..
+			"Widgets communicate", -1, -1, 290, 150))
+		btn.Show(True)
+ 
+		Return True
+	End Method
+
+End Type
+
+Type Communicate Extends wxFrame
+ 
+	Field m_lp:LeftPanel
+	Field m_rp:RightPanel 
+	Field m_parent:wxPanel 
+
+	Method OnInit()
+				
+		m_parent = New wxPanel.Create(Self, wxID_ANY)
+
+		Local hbox:wxBoxSizer = New wxBoxSizer.Create(wxHORIZONTAL)
+		
+		m_lp = LeftPanel(New LeftPanel.Create(m_parent,,,,,,wxBORDER_SUNKEN))
+		m_rp = RightPanel(New RightPanel.Create(m_parent,,,,,,wxBORDER_SUNKEN))
+		
+		hbox.Add(m_lp, 1, wxEXPAND | wxALL, 5)
+		hbox.Add(m_rp, 1, wxEXPAND | wxALL, 5)
+		
+		m_parent.SetSizer(hbox)
+
+		Centre()
+ 
+	End Method
+	
+	Function OnQuit(event:wxEvent)
+		wxWindow(event.parent).Close(True)
+	End Function
+	
+End Type
+
+Type LeftPanel Extends wxPanel
+
+	Field m_plus:wxButton
+	Field m_minus:wxButton
+	Field m_parent:wxPanel
+	Field count:Int
+	
+	Method OnInit()
+		count = 0
+		m_parent = wxPanel(GetParent())
+		
+		m_plus = New wxButton.Create(Self, ID_PLUS, "+", 10, 10)
+		m_minus = New wxButton.Create(Self, ID_MINUS, "-", 10, 60)
+		
+		Connect(ID_PLUS, wxEVT_COMMAND_BUTTON_CLICKED, OnPlus)
+		Connect(ID_MINUS, wxEVT_COMMAND_BUTTON_CLICKED, OnMinus)
+	End Method
+
+	Function OnPlus(event:wxEvent)
+		Local panel:LeftPanel = LeftPanel(event.parent)
+		
+		panel.count:+ 1
+
+		Local comm:Communicate = Communicate(panel.m_parent.GetParent())
+		comm.m_rp.m_text.SetLabel(panel.count)
+	End Function
+
+	Function OnMinus(event:wxEvent)
+		Local panel:LeftPanel = LeftPanel(event.parent)
+		
+		panel.count:- 1
+
+		Local comm:Communicate = Communicate(panel.m_parent.GetParent())
+		comm.m_rp.m_text.SetLabel(panel.count)
+	End Function
+	
+End Type
+	
+Type RightPanel Extends wxPanel
+
+	Field m_text:wxStaticText
+	
+	Method OnInit()
+		m_text = New wxStaticText.Create(Self, -1, "0", 40, 60)
+	End Method
+	
+	Function OnSetText(event:wxEvent)
+	End Function
+
+End Type
+</pre>
+
+<p>
+In our example we have two panels. A left and right panel. The left
+panel has two buttons. The right panel has one static text. The buttons
+change the number displayed in the static text. The question is, how do
+we grab the reference to the static text?
+</p>
+
+<pre class="explanation"> m_parent = wxPanel(GetParent())
+</pre>
+
+<p>
+Here we save the reference to the parent widget of the LeftPanel. It is a wxPanel widget.
+</p>
+
+<pre class="explanation"> Local comm:Communicate = Communicate(panel.m_parent.GetParent())
+ comm.m_rp.m_text.SetLabel(panel.count)
+</pre>
+
+<p>These two lines are the most important lines of the example. It is
+shown, how we get access to the static text widget, which
+is placed on a different panel. First we get the parent of the both
+left and right panels. This parent widget has a reference to the right
+panel. And the right panel has a reference to the static text. </p>
+
+<br>
+<img src="../media/widgetscommunicate.jpg" alt="Widgets communicate">
+<div class="figure">Figure: Widgets communicate</div>
+<center>
+
+</center>
+
+<center>
+<div class="botNav"><span class="botNavItem"><a href="index.html">Contents</a></span> ‡ <span class="botNavItem"><a href="#">Top of Page</a></span></div>
+</center>
+
+<div class="footer">
+<div class="signature"><span class="copyright">© 2007 Jan Bodnar</span><br>
+<span class="copyright"> Adapted for BlitzMax by Bruce A Henderson</span></div>
+</div>
+
+</div>
+</body></html>
