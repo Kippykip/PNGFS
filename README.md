@@ -1,5 +1,6 @@
-# PNGFS - PNG File Storage Converter Tool
-![PNGFS in action!](https://i.imgur.com/GG6GWFQ.png)
+# PNGFS - PNG File Storage Converter Tool V0.2
+![PNGFS in action!](https://i.imgur.com/GG6GWFQ.png)  
+[**Download Release 0.2**](https://github.com/Kippykip/PNGFS/releases)
 ## What is this project?
 This is a simple tool that converts actual files (such as .ZIP, .TXT, .Torrent  etc) into graphical data on a PNG image!
 This data can later be extracted back out into it's original file anytime later, or split into multiple PNG images and stitched together. Since PNG images feature compression, sometimes it can be smaller than the original file too!
@@ -7,7 +8,7 @@ This data can later be extracted back out into it's original file anytime later,
 
 **Ok... but why make this project?**  
 I loved using forums during the 2000s, but forums seem to be dying in favour of social media and other chat clients. But one of the features I missed on forum sites was being able to *upload attachments*.  
-![Attachments RIP](https://i.imgur.com/HwSRx33.png)
+![Attachments RIP](https://i.imgur.com/HwSRx33.png)  
 Reddit and Twitter don't have this feature, Facebook usually deletes files or just straight up blocks them. And Discord has a 8mb size limit.
 But with this PNGFS (PNG File Storage) format, files can now be shared on any site that supports PNG images.
 This also allows sites never intended for file storage such as Imgur for theretically unlimted cloud storage! (Although I'm not sure if this breaks their TOS) ![Laughing](https://i.imgur.com/TPYDJsW.gif)  
@@ -86,5 +87,5 @@ If you are using the dithered background image setting, then it's about **Width 
 	    * Added a few more file extensions in the name list.
     0.1 Alpha:
 		* Initial Patreon release / testing
-If you like what I'm doing and want to support me and the PNGFS project, you can become a Patreon member! ![O Boi](https://i.imgur.com/2lumvvr.gif)
+If you like what I'm doing and want to support me and the PNGFS project, you can become a Patreon member! ![O Boi](https://i.imgur.com/2lumvvr.gif)  
 [![Become a Patron](https://i.imgur.com/kpQ5XUP.png)](https://www.patreon.com/Kippykip)
