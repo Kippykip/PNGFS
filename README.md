@@ -5,7 +5,7 @@ This is a simple tool that converts actual files (such as .ZIP, .TXT, .Torrent  
 This data can later be extracted back out into it's original file anytime later, or split into multiple PNG images and stitched together. Since PNG images feature compression, sometimes it can be smaller than the original file too!
 
 
-**Ok... but why make this project?**
+**  Ok... but why make this project?**  
 I loved using forums during the 2000s, but forums seem to be dying in favour of social media and other chat clients. But one of the features I missed on forum sites was being able to *upload attachments*.  
 ![Attachments RIP](https://i.imgur.com/HwSRx33.png)
 Reddit and Twitter don't have this feature, Facebook usually deletes files or just straight up blocks them. And Discord has a 8mb size limit.
@@ -13,7 +13,7 @@ But with this PNGFS (PNG File Storage) format, files can now be shared on any si
 This also allows sites never intended for file storage such as Imgur for theretically unlimted cloud storage! (Although I'm not sure if this breaks their TOS) ![Laughing](https://i.imgur.com/TPYDJsW.gif)  
 
 ## How do you convert a file into a PNGFS?
-Simply click the **Convert** menu -> **Convert File to PNGFS...**  
+Simply click the **  Convert**   menu -> **  Convert File to PNGFS...**  
 ![Convert to PNGFS](https://i.imgur.com/EhF2gXC.png)
 
 These boxes simply change what the output image size (as in width and height, not filesize) will be.  
@@ -31,7 +31,7 @@ As for the Internal Filename box, that will be the default filename and extensio
 ![Input Output](https://i.imgur.com/cztJkXC.png)
 
 ## How do you convert a PNGFS image back to a file?
-Click on the **Convert** menu -> **Convert PNGFS to File...**  
+Click on the **  Convert**   menu -> **  Convert PNGFS to File...**  
 ![Convert PNGFS to File](https://i.imgur.com/7uzqvXj.png)
 
 Then select any PNGFS file on your computer.
@@ -42,21 +42,21 @@ With any luck, you'll see a default filename from the PNGFS itself. Click save a
 ![Select Output](https://i.imgur.com/gQmdY4o.png)
 
 ## Misc Stuff
-**How does the PNGFS format work?**
+**  How does the PNGFS format work?**  
 It's actually pretty simple. Each pixel in a PNG image can contain 4 bytes of information (Red, Green, Blue, Alpha). The PNGFS format here simply reads the pixels in that from the top left to the right which is then saved into a binary file (or vice versa).
 
 Of course there needs to be some kind of metadata too *(filesize? filename? checksum?)* So 32 bytes (or 8 pixels) are used as a header.
 For dithered images it works the same but every 2nd pixel is skipped. Revealing a somewhat noisy image that still contains extractable data.
-If you want exact details on how the PNGFS header works, checkout the **PNGFS Header Format.txt** file. Or extract this PNGFS image:  
+If you want exact details on how the PNGFS header works, checkout the **  PNGFS Header Format.txt**   file. Or extract this PNGFS image:  
 ![header.txt](https://i.imgur.com/HOnAvL3.png)
 
-**How much data can be stored in a PNGFS image?**
-For a rough calculation you can do **Width x Height x 4** and that's how many bytes can fit.
+**  How much data can be stored in a PNGFS image?**  
+For a rough calculation you can do **  Width x Height x 4**   and that's how many bytes can fit.
 If this is exceeded, PNGFS Converter Tool will ask to split it into multiple images.
-If you are using the dithered background image setting, then it's about **Width x Height x 2** instead, as every 2nd pixel is skipped.
+If you are using the dithered background image setting, then it's about **  Width x Height x 2**   instead, as every 2nd pixel is skipped.
 
 
-**Future plans:**
+**  Future plans:**  
 
  - I would love to add a Windows Explorer context menu, and quick
    convert command line options.      
@@ -68,7 +68,7 @@ If you are using the dithered background image setting, then it's about **Width 
 
 
 
-**Changelog:**
+**  Changelog:**  
 	0.2
 		* Cleaned up Source Code for Github release here.
 		* Added a couple new recognised file types
