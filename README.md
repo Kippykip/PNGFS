@@ -6,20 +6,20 @@ This data can later be extracted back out into it's original file anytime later,
 
 
 **Ok... but why make this project?**  
-I loved using forums during the 2000s, but forums seem to be dying in favour of social media and other chat clients. But one of the features I missed on forum sites was being able to *upload attachments*.
+I loved using forums during the 2000s, but forums seem to be dying in favour of social media and other chat clients. But one of the features I missed on forum sites was being able to *upload attachments*.  
 ![Attachments RIP](https://i.imgur.com/HwSRx33.png)
 Reddit and Twitter don't have this feature, Facebook usually deletes files or just straight up blocks them. And Discord has a 8mb size limit.
 But with this PNGFS (PNG File Storage) format, files can now be shared on any site that supports PNG images.
-This also allows sites never intended for file storage such as Imgur for theretically unlimted cloud storage! (Although I'm not sure if this breaks their TOS) ![Laughing](https://i.imgur.com/TPYDJsW.gif)
+This also allows sites never intended for file storage such as Imgur for theretically unlimted cloud storage! (Although I'm not sure if this breaks their TOS) ![Laughing](https://i.imgur.com/TPYDJsW.gif)  
 
 ## How do you convert a file into a PNGFS?
-Simply click the **Convert** menu -> **Convert File to PNGFS...**
+Simply click the **Convert** menu -> **Convert File to PNGFS...**  
 ![Convert to PNGFS](https://i.imgur.com/EhF2gXC.png)
 
-These boxes simply change what the output image size (as in width and height, not filesize) will be.
+These boxes simply change what the output image size (as in width and height, not filesize) will be.  
 ![Canvas Sizes](https://i.imgur.com/H3vlenP.png)
 
-These options allow you to change the background canvas, there are 3 modes total:
+These options allow you to change the background canvas, there are 3 modes total:  
 ![Background Canvas](https://i.imgur.com/YMhXGbb.png)
 |![Background Canvas - Dithering](https://i.imgur.com/rHL10CR.png)  |![Background Canvas - No Dithering](https://i.imgur.com/MLDwCzW.png)|![No Background Canvas](https://i.imgur.com/CMSZsQR.png)|
 |--|--|--|
@@ -27,18 +27,18 @@ These options allow you to change the background canvas, there are 3 modes total
 
 These are the main boxes where the magic happens. The input file path will be the source file you're wanting to package (Lets say a word document or something).
 The output file path is where the PNGFS image(s) will be saved.
-As for the Internal Filename box, that will be the default filename and extension that will be used when somebody or yourself extracts the PNGFS file later.
+As for the Internal Filename box, that will be the default filename and extension that will be used when somebody or yourself extracts the PNGFS file later.  
 ![Input Output](https://i.imgur.com/cztJkXC.png)
 
 ## How do you convert a PNGFS image back to a file?
-Click on the **Convert** menu -> **Convert PNGFS to File...**
+Click on the **Convert** menu -> **Convert PNGFS to File...**  
 ![Convert PNGFS to File](https://i.imgur.com/7uzqvXj.png)
 
 Then select any PNGFS file on your computer.
 If you're choosing a multipage PNGFS, it doesn't matter which one you click on, it doesn't matter what they're named or what other mixed PNGFS files are in the same directory.
 As long as all the pages for the file you are trying to export are in the same directory, it should be fine.![Select PNGFS](https://i.imgur.com/Kg1wOiN.png)
 
-With any luck, you'll see a default filename from the PNGFS itself. Click save and enjoy your file!
+With any luck, you'll see a default filename from the PNGFS itself. Click save and enjoy your file!  
 ![Select Output](https://i.imgur.com/gQmdY4o.png)
 
 ## Misc Stuff
@@ -47,7 +47,7 @@ It's actually pretty simple. Each pixel in a PNG image can contain 4 bytes of in
 
 Of course there needs to be some kind of metadata too *(filesize? filename? checksum?)* So 32 bytes (or 8 pixels) are used as a header.
 For dithered images it works the same but every 2nd pixel is skipped. Revealing a somewhat noisy image that still contains extractable data.
-If you want exact details on how the PNGFS header works, checkout the **PNGFS Header Format.txt** file. Or extract this PNGFS image:
+If you want exact details on how the PNGFS header works, checkout the **PNGFS Header Format.txt** file. Or extract this PNGFS image:  
 ![header.txt](https://i.imgur.com/HOnAvL3.png)
 
 **How much data can be stored in a PNGFS image?**  
@@ -69,7 +69,6 @@ If you are using the dithered background image setting, then it's about **Width 
 
 
 **Changelog:**  
-
 	0.2
 		* Cleaned up Source Code for Github release here.
 		* Added a couple new recognised file types
